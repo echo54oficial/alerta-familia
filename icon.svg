@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#151c28"/>
+      <stop offset="100%" stop-color="#0b0f17"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="innerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bgGrad)" stroke="#293548" stroke-width="8"/>
+
+  <!-- Outer Shield -->
+  <g filter="url(#shadow)">
+    <path d="M 256 70 
+             C 340 70 410 90 410 90 
+             C 410 260 340 370 256 430 
+             C 172 370 102 260 102 90 
+             C 102 90 172 70 256 70 Z" 
+          fill="url(#shieldGrad)"/>
+  </g>
+
+  <!-- Inner Shield Accent -->
+  <path d="M 256 100 
+           C 320 100 376 116 376 116 
+           C 376 250 320 340 256 392 
+           C 192 340 136 250 136 116 
+           C 136 116 192 100 256 100 Z" 
+        fill="#0b0f17" opacity="0.45"/>
+
+  <!-- Center Symbol: Family & Security -->
+  <!-- Central Star / Plus / Check emblem -->
+  <path d="M 226 244 L 246 264 L 296 214" 
+        fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Radio wave / alert signal on top -->
+  <circle cx="256" cy="170" r="14" fill="#ffffff"/>
+  <path d="M 218 160 C 230 146 282 146 294 160" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 200 144 C 224 124 288 124 312 144" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+</svg>

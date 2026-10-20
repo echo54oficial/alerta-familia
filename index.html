@@ -1,0 +1,2378 @@
+<!--
+  ========================================================================
+  🛡️ ALERTA FAMILIA
+  Herramienta libre y comunitaria de respuesta rápida ante ciberdelitos.
+  
+  Autor: Echo 54 (@echo54oficial)
+  GitHub: https://github.com/echo54oficial
+  
+  AVISO DE ÉTICA Y AUTORÍA:
+  Este proyecto fue creado para cuidar a la comunidad y compartir conocimiento.
+  Si usás, modificás o te inspirás en este código:
+  - No seas ladrón: respetá los créditos y la autoría original de Echo 54.
+  - No borres esta firma. La ciberseguridad se construye con honestidad.
+  - Compartilo gratis para ayudar a proteger a más familias.
+  ========================================================================
+-->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Alerta Familia - Escudo Anti-Estafas</title>
+  <meta name="author" content="Echo 54 (https://github.com/echo54oficial)">
+  <link rel="author" href="https://github.com/echo54oficial">
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="theme-color" content="#0b0f17">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Alerta Familia">
+  <!-- Tesseract.js para OCR en cliente 100% privado -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --bg-card: #151c28;
+      --bg-card-subtle: #1c2636;
+      --line: #293548;
+      --line-strong: #3b4b66;
+      --fg: #f1f5f9;
+      --fg-muted: #94a3b8;
+      --fg-dim: #64748b;
+      --accent: #38bdf8;
+      --accent-fg: #0b1120;
+
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.14);
+
+      --orange: #f97316;
+      --orange-soft: rgba(249, 115, 22, 0.14);
+
+      --purple: #a855f7;
+      --purple-soft: rgba(168, 85, 247, 0.14);
+
+      --amber: #eab308;
+      --amber-soft: rgba(234, 179, 8, 0.14);
+
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.14);
+
+      --blue: #2563eb;
+      --blue-soft: rgba(37, 99, 235, 0.15);
+
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f1f5f9;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --fg: #0f172a;
+      --fg-muted: #475569;
+      --fg-dim: #94a3b8;
+      --accent: #0284c7;
+      --accent-fg: #ffffff;
+      --shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    main {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 16px 16px 50px;
+    }
+
+    /* TOP HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+    }
+
+    .brand-text h1 {
+      font-size: 1.05rem;
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-text small {
+      font-size: 0.76rem;
+      color: var(--fg-muted);
+      display: block;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--fg);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--line-strong);
+      background: var(--bg-card-subtle);
+    }
+
+    /* VIEWS */
+    .view {
+      display: none;
+      animation: fadeIn 0.18s ease forwards;
+    }
+
+    .view.on {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* NAVIGATION / BACK */
+    .nav-back {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .btn-back {
+      background: none;
+      border: 0;
+      color: var(--fg-muted);
+      cursor: pointer;
+      padding: 6px 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-back:hover {
+      color: var(--fg);
+    }
+
+    /* TABS DE MODO (A MÍ vs A UN FAMILIAR) */
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-card);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      margin-bottom: 18px;
+      gap: 4px;
+    }
+
+    .mode-tab {
+      border: 0;
+      background: transparent;
+      color: var(--fg-muted);
+      padding: 10px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .mode-tab.on {
+      background: var(--bg-card-subtle);
+      color: var(--fg);
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .mode-tab[data-tab="mine"].on {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .mode-tab[data-tab="other"].on {
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #d8b4fe;
+    }
+
+    /* CARDS DE SITUACIÓN */
+    .situation-intro h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin: 0 0 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .situation-intro p {
+      color: var(--fg-muted);
+      font-size: 0.92rem;
+      margin: 0 0 16px;
+    }
+
+    .type-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .type-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      width: 100%;
+      text-align: left;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .type-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 5px;
+      background: var(--card-color, #ef4444);
+    }
+
+    .type-card:hover {
+      border-color: var(--card-color, #ef4444);
+      background: var(--bg-card-subtle);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .type-card:active {
+      transform: scale(0.98);
+    }
+
+    .type-card .icon-box {
+      font-size: 1.8rem;
+      line-height: 1;
+      min-width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--card-bg-soft, rgba(255, 255, 255, 0.06));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .type-card .card-content {
+      flex: 1;
+    }
+
+    .type-card .card-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .type-card .card-desc {
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      line-height: 1.35;
+    }
+
+    .type-card .card-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--card-bg-soft);
+      color: var(--card-color);
+      text-transform: uppercase;
+    }
+
+    /* CHIPS */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      margin-bottom: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+    }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: var(--fg);
+    }
+
+    label .label-sub {
+      font-weight: 400;
+      color: var(--fg-muted);
+      font-size: 0.82rem;
+      margin-left: 4px;
+    }
+
+    input[type=text],
+    input[type=tel],
+    textarea {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--fg);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
+    }
+
+    input[type=text]:focus,
+    input[type=tel]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    input.mono-input {
+      font-family: var(--mono);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 1.05rem;
+    }
+
+    .input-with-action {
+      position: relative;
+      display: flex;
+    }
+
+    .input-with-action input {
+      padding-right: 90px;
+    }
+
+    .input-action-btn {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      bottom: 6px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--fg-muted);
+      padding: 0 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .input-action-btn:hover {
+      color: var(--fg);
+      border-color: var(--line-strong);
+    }
+
+    .hint {
+      color: var(--fg-muted);
+      font-size: 0.82rem;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* CAPTURA / OCR DROPZONE */
+    .file-dropzone {
+      border: 2px dashed var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .file-dropzone:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-subtle);
+    }
+
+    .file-dropzone input[type=file] {
+      display: none;
+    }
+
+    .drop-icon {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .drop-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--fg);
+    }
+
+    .drop-sub {
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+    }
+
+    /* OCR STATUS & DETECTED PILLS */
+    .ocr-box {
+      margin-top: 10px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      display: none;
+    }
+
+    .ocr-box.active {
+      display: block;
+    }
+
+    .ocr-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--fg-muted);
+    }
+
+    .ocr-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--line-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .detected-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .detect-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--line-strong);
+      color: var(--accent);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .detect-pill:hover {
+      background: var(--accent);
+      color: var(--accent-fg);
+      border-color: var(--accent);
+    }
+
+    .shot-preview-container {
+      position: relative;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .shot-preview-img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #000;
+    }
+
+    .btn-remove-shot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 20px;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.99);
+    }
+
+    /* RESULT STEPS */
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .step-header h3 {
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-fg);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    /* PLACA PREVIEW */
+    .placa-wrapper {
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .placa-img {
+      width: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .format-selector {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-card-subtle);
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+
+    .format-btn {
+      border: 0;
+      background: transparent;
+      color: var(--fg-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .format-btn.active {
+      background: var(--accent);
+      color: var(--accent-fg);
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .action-row.single {
+      grid-template-columns: 1fr;
+    }
+
+    .btn-action {
+      border: 1px solid var(--line-strong);
+      background: var(--bg-card-subtle);
+      border-radius: 12px;
+      padding: 11px 12px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--fg);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--line);
+      border-color: var(--fg-muted);
+    }
+
+    .btn-action.btn-wa {
+      background: #15803d;
+      color: #fff;
+      border-color: #16a34a;
+    }
+
+    .btn-action.btn-wa:hover {
+      background: #166534;
+    }
+
+    .btn-action.btn-sms {
+      background: #0f766e;
+      color: #fff;
+      border-color: #0d9488;
+    }
+
+    .btn-action.btn-sms:hover {
+      background: #115e59;
+    }
+
+    .btn-action.btn-sms.disabled {
+      background: var(--bg-card-subtle);
+      color: var(--fg-dim);
+      border-color: var(--line);
+      pointer-events: none;
+    }
+
+    .btn-action.btn-contacts-agenda {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      border: 0;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-action.btn-contacts-agenda:hover {
+      filter: brightness(1.1);
+    }
+
+    /* BANNER MI CIRCULO */
+    .circle-banner {
+      background: var(--blue-soft);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .circle-banner-text {
+      font-size: 0.85rem;
+      color: #bfdbfe;
+    }
+
+    .circle-banner-text strong {
+      display: block;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+
+    .circle-banner .btn-sm {
+      background: #2563eb;
+      color: #fff;
+      border: 0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* CONTACT LIST ROW */
+    .contact-row {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr auto;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .btn-del-contact {
+      background: var(--red-soft);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* GUIA DENUNCIAS ARGENTINA */
+    .guide-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .guide-card h4 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .guide-card p {
+      margin: 0 0 8px;
+      font-size: 0.86rem;
+      color: var(--fg-muted);
+    }
+
+    .guide-card ul {
+      margin: 6px 0 10px;
+      padding-left: 20px;
+      font-size: 0.84rem;
+      color: var(--fg-muted);
+    }
+
+    .guide-card li {
+      margin-bottom: 4px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: #10b981;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+
+    .toast.on {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <!-- TOP BAR -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-text">
+          <h1>Alerta Familia</h1>
+          <small>Escudo anti-estafas</small>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btnInstallApp" type="button" style="color: var(--accent); border-color: rgba(56, 189, 248, 0.4);" title="Instalar en el celular">
+          📲 Instalar
+        </button>
+        <button class="btn-icon" id="btnOpenGuide" type="button" title="Canales oficiales de denuncia">
+          ⚖️ Denuncias
+        </button>
+        <button class="btn-icon" id="btnCfg" type="button" title="Gestionar contactos de confianza">
+          👥 Contactos
+        </button>
+        <button class="btn-icon" id="btnTheme" type="button" title="Cambiar tema">
+          🌓
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: HOME (TRIAGE / SELECCIÓN) -->
+    <section class="view on" id="v-home">
+      <!-- SELECTOR DE PERSPECTIVA -->
+      <div class="mode-tabs">
+        <button class="mode-tab on" id="tabMine" data-tab="mine" type="button">
+          🚨 Me pasó a mí
+        </button>
+        <button class="mode-tab" id="tabOther" data-tab="other" type="button">
+          🛡️ Le pasó a un familiar
+        </button>
+      </div>
+
+      <!-- MODO 1: ME PASÓ A MÍ -->
+      <div id="blockMine">
+        <div class="situation-intro">
+          <h2>¿Qué pasó?</h2>
+          <p>Elegí una situación y prepará en segundos una alerta para redes, WhatsApp y SMS.</p>
+        </div>
+        <div class="type-grid" id="typesMine"></div>
+
+        <div style="margin-top: 14px; text-align: center;">
+          <button class="btn-action" id="btnOk" type="button" style="width: 100%; border-style: dashed;">
+            ✅ Ya recuperé mi cuenta (Avisar a todos)
+          </button>
+        </div>
+      </div>
+
+      <!-- MODO 2: LE PASÓ A UN FAMILIAR O CONTACTO -->
+      <div id="blockOther" style="display:none;">
+        <div class="situation-intro">
+          <h2>¿Qué pasó?</h2>
+          <p>Elegí una situación para alertar a tu círculo y evitar que caigan en la trampa.</p>
+        </div>
+        <div class="type-grid" id="typesOther"></div>
+      </div>
+
+      <!-- BANNER SI NO HAY CÍRCULO -->
+      <div class="circle-banner" id="circleBanner" style="display:none;">
+        <div class="circle-banner-text">
+          <strong>Configurá tus contactos de emergencia</strong>
+          Agregá a tus personas de confianza para avisarles por SMS si no podés usar WhatsApp.
+        </div>
+        <button class="btn-sm" id="btnBannerCfg" type="button">Configurar</button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FORMULARIO DE DATOS -->
+    <section class="view" id="v-data">
+      <div class="nav-back">
+        <button class="btn-back" data-back type="button">‹ Cambiar situación</button>
+        <span class="chip" id="dataChip"></span>
+      </div>
+
+      <!-- ¿A QUIÉN LE PASÓ? -->
+      <div class="form-group" id="groupTargetName">
+        <label for="targetName">
+          <span id="labelTargetName">¿A quién le pasó?</span>
+          <span class="label-sub">(Ej: Mamá, Papá, Martín)</span>
+        </label>
+        <input type="text" id="targetName" placeholder="Ej: Mamá" autocomplete="off">
+      </div>
+
+      <!-- SUBIDA DE CAPTURA CON OCR -->
+      <div class="form-group" id="groupShot">
+        <label>
+          Captura de pantalla (opcional)
+          <span class="label-sub">Extrae el número y datos de pago automáticamente.</span>
+        </label>
+        <label class="file-dropzone" for="shotInput" id="dropArea">
+          <input type="file" id="shotInput" accept="image/*">
+          <span class="drop-icon">📷</span>
+          <span class="drop-title">Elegí una captura o pegala (Ctrl+V)</span>
+          <span class="drop-sub">Procesamiento privado en tu dispositivo</span>
+        </label>
+
+        <!-- ESTADO OCR -->
+        <div class="ocr-box" id="ocrBox">
+          <div class="ocr-progress-row">
+            <div class="ocr-spinner"></div>
+            <span id="ocrStatusText">Analizando imagen con OCR...</span>
+          </div>
+          <div class="detected-chips" id="detectedChips"></div>
+        </div>
+
+        <!-- PREVIEW CAPTURA -->
+        <div class="shot-preview-container" id="shotPrevContainer">
+          <img class="shot-preview-img" id="shotPrev" alt="Captura seleccionada">
+          <button type="button" class="btn-remove-shot" id="btnRemoveShot">✕ Quitar</button>
+        </div>
+      </div>
+
+      <!-- NÚMERO SOSPECHOSO -->
+      <div class="form-group" id="groupPhone">
+        <label for="numInput">
+          <span id="labelPhone">Número sospechoso</span>
+          <span class="label-sub">Lo mostraremos con espacios para leerlo mejor.</span>
+        </label>
+        <div class="input-with-action">
+          <input type="tel" id="numInput" class="mono-input" placeholder="+54 9 11 2345 6789" autocomplete="off"
+            inputmode="tel">
+          <button type="button" class="input-action-btn" id="btnPastePhone">📋 Pegar</button>
+        </div>
+        <p class="hint" id="phoneHint">Lo mostraremos con espacios para leerlo mejor.</p>
+      </div>
+
+      <!-- ALIAS O CBU (OPCIONAL) -->
+      <div class="form-group" id="groupBank">
+        <label for="bankInput">
+          Alias o CBU solicitado (opcional)
+          <span class="label-sub">Evita que otras personas transfieran dinero.</span>
+        </label>
+        <div class="input-with-action">
+          <input type="text" id="bankInput" class="mono-input" placeholder="Ej: nombre.apellido.mp o 22 dígitos"
+            autocomplete="off">
+          <button type="button" class="input-action-btn" id="btnPasteBank">📋 Pegar</button>
+        </div>
+        <p class="hint">Si te pasaron un Alias o CBU, agregalo para advertir a tus contactos.</p>
+      </div>
+
+      <!-- NOTA / DETALLE ADICIONAL -->
+      <div class="form-group">
+        <label for="noteInput">
+          Detalle breve (opcional)
+          <span class="label-sub">Una sola frase corta.</span>
+        </label>
+        <input type="text" id="noteInput" maxlength="110"
+          placeholder="Ej: Dice que tuvo una urgencia y cambió de línea" autocomplete="off">
+      </div>
+
+      <button class="btn-primary" id="btnBuild" type="button">
+        Crear alertas
+      </button>
+    </section>
+
+    <!-- VIEW 3: RESULTADOS Y DIFUSIÓN -->
+    <section class="view" id="v-result">
+      <div class="nav-back">
+        <button class="btn-back" data-back-data type="button">‹ Editar datos</button>
+        <span class="chip" id="resultChip"></span>
+      </div>
+
+      <!-- PASO 1: PLACA GRÁFICA -->
+      <div class="step-card">
+        <div class="step-header">
+          <h3><span class="step-badge">1</span> Placa para redes y estados</h3>
+          <div class="format-selector">
+            <button type="button" class="format-btn active" data-fmt="story">Estados (IG / WP)</button>
+            <button type="button" class="format-btn" data-fmt="square">Publicación</button>
+          </div>
+        </div>
+        <p class="hint" style="margin: 0 0 10px;">Compartila en tus estados para alertar a tus contactos.</p>
+        <div class="placa-wrapper">
+          <img class="placa-img" id="placaImg" alt="Placa gráfica de alerta">
+        </div>
+        <div class="action-row">
+          <button type="button" class="btn-action" id="btnSharePlaca">
+            Compartir placa
+          </button>
+          <button type="button" class="btn-action" id="btnDownloadPlaca">
+            Descargar imagen
+          </button>
+        </div>
+      </div>
+
+      <!-- PASO 2: TEXTO PARA WHATSAPP / GRUPOS -->
+      <div class="step-card">
+        <div class="step-header">
+          <h3><span class="step-badge">2</span> Mensaje para grupos y redes</h3>
+        </div>
+        <p class="hint" style="margin: 0 0 10px;">Copiá el mensaje o envialo directamente a tus grupos.</p>
+        <textarea id="txtMessage" rows="5" aria-label="Texto de alerta"></textarea>
+        <div class="action-row">
+          <button type="button" class="btn-action" id="btnCopyText">
+            Copiar mensaje
+          </button>
+          <a class="btn-action btn-wa" id="btnSendWa" href="#" target="_blank" rel="noopener">
+            Enviar por WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- PASO 3: SMS DE EMERGENCIA -->
+      <div class="step-card" id="cardSms">
+        <div class="step-header">
+          <h3><span class="step-badge">3</span> SMS de emergencia</h3>
+        </div>
+        <p class="hint" style="margin: 0 0 10px;">Avisá a tus contactos de emergencia si no podés usar WhatsApp.</p>
+        <div class="action-row single">
+          <a class="btn-action btn-sms" id="btnSendSms" href="#">
+            Enviar SMS
+          </a>
+        </div>
+        <p class="hint" id="smsStatusHint"></p>
+      </div>
+
+      <!-- QUÉ HACER AHORA -->
+      <div class="step-card" style="border-left: 4px solid var(--accent);">
+        <div class="step-header">
+          <h3>Qué hacer ahora - Primeros 15 minutos</h3>
+        </div>
+        <p class="hint" style="margin: 0 0 10px;">Consultá los canales oficiales y conservá las pruebas.</p>
+        <div class="action-row single" style="gap:8px;">
+          <a class="btn-action" id="btnKillWa" href="#">
+            Suspender cuenta de WhatsApp por correo
+          </a>
+          <button type="button" class="btn-action" id="btnGoDenuncias">
+            Ver dónde denunciar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: CONFIGURACIÓN DE CONTACTOS DE CONFIANZA -->
+    <section class="view" id="v-cfg">
+      <div class="nav-back">
+        <button class="btn-back" data-back type="button">‹ Volver al inicio</button>
+      </div>
+      <div class="situation-intro">
+        <h2>Contactos de emergencia</h2>
+        <p>Hasta 8 personas de confianza para avisarles por SMS si no podés usar WhatsApp.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="cfgMyName">Tu nombre</label>
+        <input type="text" id="cfgMyName" placeholder="Ej: Carlos / Mamá" autocomplete="off">
+        <p class="hint">Aparecerá como remitente de las alertas para que te reconozcan rápido.</p>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label style="margin:0;">Personas de confianza</label>
+          <button type="button" class="btn-action btn-contacts-agenda" id="btnPickAgenda" style="padding:6px 12px; font-size:0.8rem;">
+            📖 Elegir de la agenda
+          </button>
+        </div>
+        <div id="contactList"></div>
+        <button type="button" class="btn-action" id="btnAddContact" style="width:100%; margin-top:8px;">
+          + Agregar contacto manualmente
+        </button>
+      </div>
+
+      <button class="btn-primary" id="btnSaveCfg" type="button">
+        Guardar contactos
+      </button>
+    </section>
+
+    <!-- VIEW 5: GUÍA OFICIAL DE DENUNCIAS ARGENTINA -->
+    <section class="view" id="v-guide">
+      <div class="nav-back">
+        <button class="btn-back" data-back type="button">‹ Volver</button>
+      </div>
+      <div class="situation-intro">
+        <h2>Dónde denunciar y qué hacer</h2>
+        <p>Canales oficiales en Argentina y preservación de pruebas.</p>
+      </div>
+
+      <!-- UFECI -->
+      <div class="guide-card">
+        <h4>🏛️ UFECI (Ministerio Público Fiscal de la Nación)</h4>
+        <p>Unidad Fiscal Especializada en Ciberdelincuencia de Argentina. Recibe denuncias directas por correo electrónico.</p>
+        <ul>
+          <li><strong>Correo:</strong> <a href="mailto:denunciasufeci@mpf.gov.ar"
+              style="color:var(--accent);">denunciasufeci@mpf.gov.ar</a></li>
+          <li><strong>Teléfono:</strong> <a href="tel:01150710040" style="color:var(--accent);">(011) 5071-0040</a></li>
+          <li><strong>Qué adjuntar:</strong> Capturas enteras con fecha, hora y número visible, CBU/CVU o Alias si pidieron transferencias, y comprobante bancario (ID Coelsa) si se llegó a pagar.</li>
+        </ul>
+        <a class="btn-action"
+          href="mailto:denunciasufeci@mpf.gov.ar?subject=Denuncia%20por%20intento%20de%20estafa%20/%20suplantaci%C3%B3n&body=Estimados%20UFECI,%0A%0ARadico%20la%20presente%20denuncia%20por%20ciberdelito.%0A%0ADatos%20del%20hecho:%0A-%20Fecha%20y%20hora:%0A-%20N%C3%BAmero%20utilizado%20por%20los%20atacantes:%0A-%20Datos%20bancarios%20o%20Alias%20solicitados:%0A-%20Relato%20breve%20de%20lo%20sucedido:%0A%0AAdjunto%20capturas%20completas%20de%20prueba."
+          style="display:inline-flex;">
+          Redactar denuncia a UFECI
+        </a>
+      </div>
+
+      <!-- WHATSAPP OFICIAL -->
+      <div class="guide-card">
+        <h4>📱 Desactivar cuenta robada en WhatsApp</h4>
+        <p>Si tomaron el control de tu WhatsApp, enviá un correo inmediato a Meta para suspender la cuenta y forzar el cierre de sesión del atacante.</p>
+        <ul>
+          <li><strong>Destinatario:</strong> <code>support@whatsapp.com</code></li>
+          <li><strong>Asunto exacto:</strong> <code>Teléfono robado/extraviado: Por favor, desactiva mi cuenta</code></li>
+          <li><strong>Cuerpo:</strong> Tu número en formato internacional (Ej: <code>+54 9 11 xxxx-xxxx</code>).</li>
+        </ul>
+        <a class="btn-action" id="btnMailWaGuide" href="#">
+          Enviar correo a WhatsApp
+        </a>
+      </div>
+
+      <!-- COMISARÍA Y FISCALÍA -->
+      <div class="guide-card">
+        <h4>👮 Comisaría o Fiscalía Penal de Turno</h4>
+        <p>Podés radicar la denuncia presencial en la comisaría de tu barrio o en el Ministerio Público Fiscal de tu jurisdicción.</p>
+        <ul>
+          <li><strong>Encuadre Legal:</strong> Infracción a los artículos 172 y 173 del Código Penal (Estafa) y Ley 26.388 de Delitos Informáticos.</li>
+          <li><strong>Regla de oro:</strong> NO borres ningún mensaje ni bloquees antes de tomar capturas completas. Las capturas son tu evidencia penal.</li>
+        </ul>
+      </div>
+
+      <!-- BANCOS / BILLETERAS -->
+      <div class="guide-card">
+        <h4>🏦 Si alguien llegó a transferir dinero</h4>
+        <p>Actuá dentro de los primeros 30 a 60 minutos para frenar la dispersión de los fondos:</p>
+        <ul>
+          <li>Llamá a la línea de fraude de tu banco para solicitar el <strong>Stop Debit / Rastreo de Transferencia</strong>.</li>
+          <li>Si la cuenta receptora es Mercado Pago, Cuenta DNI, Ualá, etc., contactá a soporte denunciando la cuenta para su bloqueo preventivo.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FOOTER DE AUTORÍA -->
+    <footer style="margin-top: 36px; text-align: center; font-size: 0.8rem; color: var(--fg-dim); padding-top: 18px; border-top: 1px solid var(--line);">
+      Creado por <a href="https://github.com/echo54oficial" target="_blank" rel="noopener" style="color: var(--fg-muted); text-decoration: underline; font-weight: 600;">Echo 54</a> · Código libre para cuidar a la comunidad
+    </footer>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Créditos y firma del autor
+      console.log(
+        "%c🛡️ Alerta Familia %cby Echo 54\n%chttps://github.com/echo54oficial\n\nCódigo libre para la comunidad. Si lo usás o lo editás, sé honesto: no borres los créditos ni seas ladrón.",
+        "background:#ef4444; color:#fff; font-size:13px; font-weight:bold; padding:3px 7px; border-radius:4px;",
+        "color:#38bdf8; font-size:13px; font-weight:bold;",
+        "color:#94a3b8; font-size:11px;"
+      );
+
+      // SITUACIONES: MODO PROPIO (ME PASÓ A MÍ)
+      var SITUATIONS_MINE = {
+        robo: {
+          em: "🔴",
+          title: "Me robaron WhatsApp",
+          desc: "Tomaron el control de mi cuenta.",
+          label: "ME ROBARON WHATSAPP",
+          color: "#ef4444",
+          tag: "URGENTE",
+          isOther: false,
+          needPhone: false,
+          rules: [
+            "No respondas mis mensajes ni envíes dinero.",
+            "Si administrás un grupo conmigo, eliminame temporalmente.",
+            "Para hablar conmigo, llamame por teléfono común."
+          ],
+          buildTxt: function (ctx) {
+            var bank = ctx.bank ? " No transfieran al Alias/CBU: *" + ctx.bank + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "🚨 Me robaron WhatsApp. No respondan mis mensajes, no transfieran dinero ni compartan códigos. Para hablar conmigo, llámenme por teléfono. Si administrás un grupo, eliminame temporalmente." + bank + q;
+          }
+        },
+        suplant_me: {
+          em: "🟣",
+          title: "Perfil falso con mi foto",
+          desc: "Usan mi foto con otro número.",
+          label: "PERFIL FALSO CON MI FOTO",
+          color: "#a855f7",
+          tag: "SUPLANTACIÓN",
+          isOther: false,
+          needPhone: true,
+          rules: [
+            "Yo no cambié mi número telefónico.",
+            "No transfieras dinero ni compartas datos personales.",
+            "Bloqueá y reportá el contacto sospechoso."
+          ],
+          buildTxt: function (ctx) {
+            var num = ctx.num ? " Número sospechoso a bloquear: *" + ctx.num + "*." : "";
+            var bank = ctx.bank ? " No transfieran al Alias/CBU: *" + ctx.bank + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "⚠️ Están usando mi foto con otro número. No lo agenden, no transfieran dinero y no compartan datos. Bloqueen y reporten el contacto. Mi número sigue siendo el de siempre." + num + bank + q;
+          }
+        },
+        hackeo_me: {
+          em: "🟠",
+          title: "Intento de hackeo",
+          desc: "Me pidieron códigos o abrí un enlace extraño.",
+          label: "INTENTO DE HACKEO",
+          color: "#f97316",
+          tag: "ALERTA",
+          isOther: false,
+          needPhone: true,
+          rules: [
+            "No abras enlaces extraños ni respondas pedidos raros.",
+            "Nunca compartas códigos de 6 dígitos que lleguen por SMS.",
+            "Bloqueá el contacto y avisá a tus conocidos."
+          ],
+          buildTxt: function (ctx) {
+            var num = ctx.num ? " Número sospechoso: *" + ctx.num + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "⚠️ Detecté un intento de hackeo. No abran enlaces sospechosos ni compartan códigos de 6 dígitos. Verifiquen cualquier pedido por otro medio." + num + q;
+          }
+        },
+        estafa_me: {
+          em: "🟡",
+          title: "Intento de estafa",
+          desc: "Me pidieron dinero o datos personales.",
+          label: "INTENTO DE ESTAFA",
+          color: "#eab308",
+          tag: "CUIDADO",
+          isOther: false,
+          needPhone: true,
+          rules: [
+            "No transfieras señas ni entregues datos bancarios.",
+            "Verificá siempre por otra vía antes de pagar.",
+            "Bloqueá el contacto sospechoso."
+          ],
+          buildTxt: function (ctx) {
+            var num = ctx.num ? " Número: *" + ctx.num + "*." : "";
+            var bank = ctx.bank ? " Alias/CBU solicitado: *" + ctx.bank + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "⚠️ Detecté un intento de estafa. No respondan, no compartan códigos ni datos bancarios y no transfieran dinero. Verifiquen cualquier pedido por otro medio." + num + bank + q;
+          }
+        }
+      };
+
+      // SITUACIONES: MODO FAMILIAR / TERCERO (REPLICAR ALERTA)
+      var SITUATIONS_OTHER = {
+        robo_other: {
+          em: "🚨",
+          title: "Le robaron WhatsApp a un familiar",
+          desc: "Tomaron la cuenta de un ser querido.",
+          label: "HACKEARON A UN FAMILIAR",
+          color: "#ef4444",
+          tag: "URGENTE",
+          isOther: true,
+          needPhone: false,
+          rules: [
+            "No respondas sus mensajes ni envíes dinero.",
+            "Si administrás un grupo con él/ella, eliminalo temporalmente.",
+            "Llamalo por teléfono común para comunicarte."
+          ],
+          buildTxt: function (ctx) {
+            var name = ctx.targetName ? ctx.targetName : "un familiar";
+            var bank = ctx.bank ? " No transfieran al Alias/CBU: *" + ctx.bank + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "🚨 Le robaron WhatsApp a *" + name + "*. No respondan sus mensajes, no transfieran dinero ni compartan códigos. Si administrás un grupo con él/ella, eliminalo temporalmente. Para comunicarse, llámenlo por teléfono común." + bank + q;
+          }
+        },
+        suplant_other: {
+          em: "🎭",
+          title: "Perfil falso de un familiar",
+          desc: "Escriben desde otro número con su foto.",
+          label: "PERFIL FALSO DE FAMILIAR",
+          color: "#a855f7",
+          tag: "SUPLANTACIÓN",
+          isOther: true,
+          needPhone: true,
+          rules: [
+            "No es su número real: no lo agendes ni respondas.",
+            "No transfieras dinero ni compartas datos.",
+            "Bloqueá y reportá el contacto sospechoso."
+          ],
+          buildTxt: function (ctx) {
+            var name = ctx.targetName ? ctx.targetName : "un familiar";
+            var num = ctx.num ? " Número sospechoso a bloquear: *" + ctx.num + "*." : "";
+            var bank = ctx.bank ? " No transfieran al Alias/CBU: *" + ctx.bank + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "⚠️ Están usando la foto de *" + name + "* con otro número. No lo agenden ni transfieran dinero. Su número sigue siendo el de siempre. Bloqueen y reporten ese contacto." + num + bank + q;
+          }
+        },
+        scam_number: {
+          em: "⚠️",
+          title: "Número sospechoso",
+          desc: "Avisar sobre un número que intenta estafar.",
+          label: "NÚMERO SOSPECHOSO",
+          color: "#f97316",
+          tag: "BLOQUEAR",
+          isOther: true,
+          needPhone: true,
+          rules: [
+            "Número identificado enviando mensajes falsos.",
+            "Bloquear en WhatsApp y llamadas.",
+            "No transferir dinero bajo ningún concepto."
+          ],
+          buildTxt: function (ctx) {
+            var num = ctx.num ? " Número a bloquear: *" + ctx.num + "*." : "";
+            var bank = ctx.bank ? " Alias/CBU asociado: *" + ctx.bank + "*." : "";
+            var q = ctx.note ? " Detalle: " + ctx.note + "." : "";
+            return "⚠️ Número sospechoso: están enviando mensajes falsos y pedidos de dinero. Bloqueen y reporten este contacto." + num + bank + q;
+          }
+        }
+      };
+
+      var SITUATION_OK = {
+        em: "✅",
+        title: "Ya recuperé mi cuenta",
+        desc: "Aviso de calma y control restablecido.",
+        label: "CUENTA RECUPERADA",
+        color: "#22c55e",
+        tag: "TODO SEGURO",
+        isOther: false,
+        needPhone: false,
+        rules: [
+          "La cuenta ya está recuperada y bajo control.",
+          "No tomes en cuenta pedidos de dinero anteriores.",
+          "Pueden volver a escribirme con normalidad."
+        ],
+        buildTxt: function (ctx) {
+          var from = ctx.myName ? " (" + ctx.myName + ")" : "";
+          return "✅ Ya recuperé mi cuenta de WhatsApp" + from + ". No tomen en cuenta los mensajes anteriores ni transfieran dinero. Pueden volver a escribirme con normalidad.";
+        }
+      };
+
+      // APP STATE
+      var state = {
+        mode: "mine", // "mine" | "other"
+        curKey: null,
+        curSituation: null,
+        fmt: "story", // "story" | "square"
+        cfg: {
+          name: "",
+          contacts: []
+        },
+        shotBlob: null,
+        ocrRunning: false
+      };
+
+      function $(id) { return document.getElementById(id); }
+
+      // TOAST FEEDBACK
+      function showToast(msg) {
+        var t = $("toast");
+        t.textContent = msg;
+        t.classList.add("on");
+        setTimeout(function () { t.classList.remove("on"); }, 2200);
+      }
+
+      // STORAGE
+      function loadConfig() {
+        try {
+          var r = localStorage.getItem("af_cfg_v2");
+          if (!r) r = localStorage.getItem("af_cfg");
+          if (r) {
+            var o = JSON.parse(r);
+            if (o && typeof o === "object") {
+              state.cfg.name = String(o.name || "");
+              state.cfg.contacts = Array.isArray(o.contacts) ? o.contacts : [];
+            }
+          }
+        } catch (e) { }
+      }
+
+      function saveConfig() {
+        try {
+          localStorage.setItem("af_cfg_v2", JSON.stringify(state.cfg));
+          return true;
+        } catch (e) { return false; }
+      }
+
+      // TEMA LIGHT/DARK
+      function initTheme() {
+        var saved = localStorage.getItem("af_theme");
+        if (saved) {
+          document.documentElement.setAttribute("data-theme", saved);
+        } else {
+          var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+        }
+      }
+
+      function toggleTheme() {
+        var cur = document.documentElement.getAttribute("data-theme");
+        var next = cur === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("af_theme", next);
+        if ($("v-result").classList.contains("on")) {
+          renderPlaca();
+        }
+      }
+
+      // NAVEGACIÓN ENTRE VISTAS
+      function showView(viewId) {
+        var views = document.querySelectorAll(".view");
+        views.forEach(function (v) { v.classList.remove("on"); });
+        var target = $(viewId);
+        if (target) target.classList.add("on");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // FORMATEADOR TELEFÓNICO HUMANO (ARGENTINA / INTERNACIONAL)
+      function formatHumanPhone(raw) {
+        if (!raw) return "";
+        var str = String(raw).trim();
+        var hasPlus = str.startsWith("+");
+        var d = str.replace(/\D/g, "");
+        if (!d) return "";
+
+        // Si comienza con 54 (Argentina)
+        if (d.startsWith("54")) {
+          d = d.slice(2);
+          if (d.startsWith("9")) d = d.slice(1);
+          return "+54 9 " + formatNational(d);
+        }
+        // Código interurbano con 0 inicial (ej 011 -> 11)
+        if (d.startsWith("0")) {
+          d = d.slice(1);
+        }
+        // 15 en AMBA (ej: 11 15 4433 2211)
+        if (d.length >= 8 && d.startsWith("1115")) {
+          d = "11" + d.slice(4);
+        }
+
+        if (hasPlus) {
+          return "+" + d;
+        }
+        return formatNational(d);
+      }
+
+      function formatNational(d) {
+        if (d.startsWith("11")) {
+          var r = d.slice(2);
+          var p1 = r.slice(0, 4);
+          var p2 = r.slice(4, 8);
+          return "11" + (p1 ? " " + p1 : "") + (p2 ? "-" + p2 : "");
+        }
+        if (d.length >= 10) {
+          var a = d.slice(0, 3);
+          var rest = d.slice(3);
+          var q1 = rest.slice(0, 3);
+          var q2 = rest.slice(3, 7);
+          return a + (q1 ? " " + q1 : "") + (q2 ? "-" + q2 : "");
+        }
+        return d;
+      }
+
+      function cleanPhoneDigits(raw) {
+        return String(raw || "").replace(/[^\d+]/g, "");
+      }
+
+      // RENDER BOTONES DE SITUACIONES
+      function renderSituations() {
+        var cMine = $("typesMine");
+        cMine.innerHTML = "";
+        Object.keys(SITUATIONS_MINE).forEach(function (k) {
+          cMine.appendChild(createTypeCard(k, SITUATIONS_MINE[k]));
+        });
+
+        var cOther = $("typesOther");
+        cOther.innerHTML = "";
+        Object.keys(SITUATIONS_OTHER).forEach(function (k) {
+          cOther.appendChild(createTypeCard(k, SITUATIONS_OTHER[k]));
+        });
+      }
+
+      function createTypeCard(key, item) {
+        var card = document.createElement("button");
+        card.type = "button";
+        card.className = "type-card";
+        card.style.setProperty("--card-color", item.color);
+        card.style.setProperty("--card-bg-soft", item.color + "22");
+
+        var iconBox = document.createElement("div");
+        iconBox.className = "icon-box";
+        iconBox.textContent = item.em;
+
+        var content = document.createElement("div");
+        content.className = "card-content";
+
+        var title = document.createElement("div");
+        title.className = "card-title";
+        title.innerHTML = '<span>' + item.title + '</span><span class="card-tag">' + item.tag + '</span>';
+
+        var desc = document.createElement("div");
+        desc.className = "card-desc";
+        desc.textContent = item.desc;
+
+        content.appendChild(title);
+        content.appendChild(desc);
+        card.appendChild(iconBox);
+        card.appendChild(content);
+
+        card.addEventListener("click", function () {
+          selectSituation(key, item);
+        });
+        return card;
+      }
+
+      function selectSituation(key, item) {
+        state.curKey = key;
+        state.curSituation = item;
+
+        // Actualizar Chip
+        var chip = $("dataChip");
+        chip.textContent = item.em + " " + item.title;
+        chip.style.borderColor = item.color;
+        chip.style.color = item.color;
+
+        // Ajustar campos según situación
+        if (item.isOther) {
+          $("groupTargetName").style.display = "block";
+          $("labelTargetName").textContent = "¿A quién le pasó?";
+          $("targetName").placeholder = "Ej: Mamá";
+          $("targetName").value = "";
+        } else {
+          $("groupTargetName").style.display = "none";
+          $("targetName").value = state.cfg.name || "";
+        }
+
+        // Teléfono
+        if (item.needPhone) {
+          $("groupPhone").style.display = "block";
+          $("labelPhone").textContent = "Número sospechoso";
+          $("numInput").placeholder = "+54 9 11 2345 6789";
+        } else {
+          $("groupPhone").style.display = "none";
+          $("numInput").value = "";
+        }
+
+        // Limpieza de campos opcionales
+        $("bankInput").value = "";
+        $("noteInput").value = "";
+        resetShot();
+
+        showView("v-data");
+      }
+
+      // MANEJO DE CAPTURA Y OCR
+      function resetShot() {
+        state.shotBlob = null;
+        $("shotInput").value = "";
+        $("shotPrevContainer").style.display = "none";
+        $("shotPrev").src = "";
+        $("ocrBox").classList.remove("active");
+        $("detectedChips").innerHTML = "";
+      }
+
+      function handleImageFile(file) {
+        if (!file || !file.type.startsWith("image/")) return;
+        state.shotBlob = file;
+        var previewUrl = URL.createObjectURL(file);
+        $("shotPrev").src = previewUrl;
+        $("shotPrevContainer").style.display = "block";
+
+        runOCR(file);
+      }
+
+      function runOCR(imageSource) {
+        var ocrBox = $("ocrBox");
+        var statusText = $("ocrStatusText");
+        var chipsContainer = $("detectedChips");
+
+        ocrBox.classList.add("active");
+        chipsContainer.innerHTML = "";
+        statusText.textContent = "🔍 Analizando captura...";
+
+        if (!window.Tesseract) {
+          statusText.textContent = "OCR no disponible sin conexión. Podés escribir el número abajo.";
+          return;
+        }
+
+        state.ocrRunning = true;
+        window.Tesseract.recognize(imageSource, 'spa+eng', {
+          logger: function (m) {
+            if (m.status === 'recognizing text') {
+              var p = Math.round((m.progress || 0) * 100);
+              statusText.textContent = "🔍 Leyendo texto de la captura: " + p + "%...";
+            }
+          }
+        }).then(function (result) {
+          state.ocrRunning = false;
+          var text = (result && result.data && result.data.text) ? result.data.text : "";
+          parseOcrResults(text);
+        }).catch(function () {
+          state.ocrRunning = false;
+          statusText.textContent = "Captura lista. Podés cargar el número abajo.";
+        });
+      }
+
+      function parseOcrResults(fullText) {
+        var statusText = $("ocrStatusText");
+        var chipsContainer = $("detectedChips");
+        chipsContainer.innerHTML = "";
+
+        if (!fullText || fullText.trim().length === 0) {
+          statusText.textContent = "No se detectó texto legible. Completá los campos abajo.";
+          return;
+        }
+
+        var foundSomething = false;
+
+        // 1. Detectar teléfonos
+        var phoneRegex = /(?:\+?54\s?9?\s?)?(?:0?[1-9]\d{1,3})[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g;
+        var phones = fullText.match(phoneRegex) || [];
+        var uniquePhones = {};
+        phones.forEach(function (p) {
+          var digits = p.replace(/\D/g, "");
+          if (digits.length >= 8 && digits.length <= 14) {
+            var formatted = formatHumanPhone(p);
+            if (!uniquePhones[formatted]) {
+              uniquePhones[formatted] = true;
+              foundSomething = true;
+              var pill = document.createElement("button");
+              pill.type = "button";
+              pill.className = "detect-pill";
+              pill.innerHTML = '📱 Usar: <strong>' + formatted + '</strong>';
+              pill.addEventListener("click", function () {
+                $("numInput").value = formatted;
+                $("groupPhone").style.display = "block";
+                showToast("Número cargado");
+              });
+              chipsContainer.appendChild(pill);
+            }
+          }
+        });
+
+        // 2. Detectar CBU / CVU (22 dígitos exactos)
+        var cbuRegex = /\b\d{22}\b/g;
+        var cbus = fullText.match(cbuRegex) || [];
+        cbus.forEach(function (cbu) {
+          foundSomething = true;
+          var pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = "detect-pill";
+          pill.innerHTML = '🏦 Usar CBU: <strong>' + cbu.slice(0, 8) + '...' + cbu.slice(-4) + '</strong>';
+          pill.addEventListener("click", function () {
+            $("bankInput").value = cbu;
+            showToast("CBU cargado");
+          });
+          chipsContainer.appendChild(pill);
+        });
+
+        // 3. Detectar Alias bancarios
+        var aliasRegex = /\b[a-zA-Z0-9_-]{3,20}\.[a-zA-Z0-9_-]{3,20}\.[a-zA-Z0-9_-]{3,20}\b/g;
+        var aliases = fullText.match(aliasRegex) || [];
+        aliases.forEach(function (alias) {
+          foundSomething = true;
+          var pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = "detect-pill";
+          pill.innerHTML = '🏷️ Usar Alias: <strong>' + alias + '</strong>';
+          pill.addEventListener("click", function () {
+            $("bankInput").value = alias;
+            showToast("Alias cargado");
+          });
+          chipsContainer.appendChild(pill);
+        });
+
+        if (foundSomething) {
+          statusText.textContent = "✨ Tocá un dato detectado para cargarlo:";
+        } else {
+          statusText.textContent = "Texto leído. Si ves el número en la imagen, tipealo abajo:";
+        }
+      }
+
+      // GENERAR CONTENIDO Y PLACA
+      function buildAlert() {
+        var cur = state.curSituation;
+        var ctx = {
+          myName: state.cfg.name.trim(),
+          targetName: $("targetName").value.trim(),
+          num: formatHumanPhone($("numInput").value.trim()),
+          bank: $("bankInput").value.trim(),
+          note: $("noteInput").value.trim()
+        };
+
+        // Actualizar Chip de resultados
+        var chip = $("resultChip");
+        chip.textContent = cur.em + " " + (cur.isOther && ctx.targetName ? "Alerta sobre " + ctx.targetName : cur.title);
+        chip.style.borderColor = cur.color;
+        chip.style.color = cur.color;
+
+        // Generar texto
+        var fullTxt = cur.buildTxt(ctx);
+        $("txtMessage").value = fullTxt;
+
+        // WhatsApp Direct Link
+        $("btnSendWa").href = "https://wa.me/?text=" + encodeURIComponent(fullTxt);
+
+        // Render Placa en Canvas
+        renderPlaca();
+
+        // Actualizar botón SMS
+        updateSmsButton(fullTxt);
+
+        // Preparar correo para soporte de WhatsApp
+        setupKillSwitchLink(ctx);
+
+        showView("v-result");
+      }
+
+      function setupKillSwitchLink(ctx) {
+        var phone = cleanPhoneDigits(ctx.num || "");
+        var subject = encodeURIComponent("Teléfono robado/extraviado: Por favor, desactiva mi cuenta");
+        var body = encodeURIComponent("Estimado soporte de WhatsApp,\n\nSolicito la desactivación urgente de mi cuenta por robo o suplantación no autorizada.\n\nNúmero de teléfono en formato internacional: " + (phone ? phone : "+54 9 ...") + "\n\nMuchas gracias.");
+        $("btnKillWa").href = "mailto:support@whatsapp.com?subject=" + subject + "&body=" + body;
+        $("btnMailWaGuide").href = $("btnKillWa").href;
+      }
+
+      function updateSmsButton(fullTxt) {
+        var list = getValidCircle();
+        var btn = $("btnSendSms");
+        var hint = $("smsStatusHint");
+
+        if (!list.length) {
+          btn.className = "btn-action btn-sms disabled";
+          btn.removeAttribute("href");
+          btn.textContent = "Enviar SMS";
+          hint.textContent = "Configurá tus contactos de emergencia para avisarles con un toque.";
+          return;
+        }
+
+        var numbers = list.map(function (c) { return cleanPhoneDigits(c.phone); }).join(",");
+        var shortSms = fullTxt.length > 280 ? fullTxt.slice(0, 260) + "..." : fullTxt;
+
+        var isApple = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
+        var smsUri = isApple
+          ? "sms:/open?addresses=" + numbers + "&body=" + encodeURIComponent(shortSms)
+          : "sms:" + numbers + "?body=" + encodeURIComponent(shortSms);
+
+        btn.className = "btn-action btn-sms";
+        btn.href = smsUri;
+        btn.textContent = "Enviar SMS (" + list.length + (list.length === 1 ? " contacto)" : " contactos)");
+        hint.textContent = "Se abre tu app de mensajes lista para enviar.";
+      }
+
+      // DIBUJO DE PLACA EN CANVAS (1080x1920 Story / 1080x1080 Cuadrada)
+      function renderPlaca() {
+        var cur = state.curSituation;
+        var isStory = state.fmt === "story";
+        var W = 1080;
+        var H = isStory ? 1920 : 1080;
+
+        var cv = document.createElement("canvas");
+        cv.width = W;
+        cv.height = H;
+        var c = cv.getContext("2d");
+
+        var targetName = $("targetName").value.trim();
+        var num = formatHumanPhone($("numInput").value.trim());
+        var bank = $("bankInput").value.trim();
+        var note = $("noteInput").value.trim();
+        var fontStack = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+        // 1. Fondo degradado
+        var grad = c.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, cur.color);
+        grad.addColorStop(1, "#090d14");
+        c.fillStyle = grad;
+        c.fillRect(0, 0, W, H);
+
+        c.fillStyle = "rgba(0, 0, 0, 0.35)";
+        c.fillRect(0, 0, W, isStory ? 36 : 24);
+        c.fillRect(0, H - (isStory ? 36 : 24), W, isStory ? 36 : 24);
+
+        c.fillStyle = "#ffffff";
+        c.textAlign = "left";
+        c.textBaseline = "alphabetic";
+
+        var marginX = 84;
+        var cursorY = isStory ? 230 : 140;
+
+        // Badge superior
+        c.fillStyle = "rgba(255, 255, 255, 0.22)";
+        var badgeW = isStory ? 440 : 360;
+        var badgeH = isStory ? 58 : 48;
+        roundRect(c, marginX, cursorY - (isStory ? 44 : 36), badgeW, badgeH, 12);
+        c.fill();
+
+        c.fillStyle = "#ffffff";
+        c.font = "800 " + (isStory ? 28 : 22) + "px " + fontStack;
+        c.fillText("🛡️ ALERTA PREVENTIVA", marginX + 22, cursorY - (isStory ? 6 : 4));
+
+        cursorY += isStory ? 110 : 80;
+
+        // TÍTULO
+        c.font = "900 " + (isStory ? 130 : 96) + "px " + fontStack;
+        var mainTitle = state.curKey === "ok" ? "AVISO" : "¡ALERTA!";
+        c.fillText(mainTitle, marginX, cursorY);
+
+        cursorY += isStory ? 80 : 64;
+
+        // SUBTÍTULO
+        c.font = "800 " + (isStory ? 54 : 44) + "px " + fontStack;
+        var subHeadline = cur.label;
+        if (cur.isOther && targetName) {
+          subHeadline = "HACKEARON A " + targetName.toUpperCase();
+        }
+        cursorY = wrapText(c, subHeadline, marginX, cursorY, W - (2 * marginX), isStory ? 68 : 52);
+
+        cursorY += isStory ? 40 : 24;
+
+        // CAJA DESTACADA: NÚMERO O ALIAS (SI EXISTE)
+        if (num || bank) {
+          var boxH = (num && bank) ? (isStory ? 220 : 170) : (isStory ? 140 : 110);
+          c.fillStyle = "rgba(0, 0, 0, 0.55)";
+          roundRect(c, marginX, cursorY, W - (2 * marginX), boxH, 18);
+          c.fill();
+          c.strokeStyle = "rgba(255, 255, 255, 0.35)";
+          c.lineWidth = 2;
+          c.stroke();
+
+          var inY = cursorY + (isStory ? 48 : 38);
+          if (num) {
+            c.fillStyle = "#fca5a5";
+            c.font = "700 " + (isStory ? 26 : 20) + "px " + fontStack;
+            c.fillText("NÚMERO SOSPECHOSO:", marginX + 30, inY);
+            inY += isStory ? 46 : 36;
+
+            c.fillStyle = "#ffffff";
+            c.font = "800 " + (isStory ? 52 : 38) + "px monospace, " + fontStack;
+            c.fillText(num, marginX + 30, inY);
+            inY += isStory ? 50 : 38;
+          }
+          if (bank) {
+            c.fillStyle = "#fde047";
+            c.font = "700 " + (isStory ? 26 : 20) + "px " + fontStack;
+            c.fillText("NO TRANSFERIR A ESTE CBU / ALIAS:", marginX + 30, inY);
+            inY += isStory ? 42 : 32;
+
+            c.fillStyle = "#ffffff";
+            c.font = "800 " + (isStory ? 40 : 30) + "px monospace, " + fontStack;
+            c.fillText(bank.slice(0, 36), marginX + 30, inY);
+          }
+          cursorY += boxH + (isStory ? 40 : 25);
+        }
+
+        // DIRECTIVAS Y REGLAS DE ACCIÓN
+        c.fillStyle = "#ffffff";
+        cur.rules.forEach(function (rule) {
+          c.font = "800 " + (isStory ? 44 : 34) + "px " + fontStack;
+          c.fillText("•", marginX, cursorY + (isStory ? 4 : 2));
+
+          c.font = "700 " + (isStory ? 42 : 32) + "px " + fontStack;
+          cursorY = wrapText(c, rule, marginX + 36, cursorY + (isStory ? 2 : 0), W - (2 * marginX) - 36, isStory ? 54 : 42) + (isStory ? 22 : 12);
+        });
+
+        // NOTA BREVE ADICIONAL
+        if (note) {
+          cursorY += isStory ? 20 : 10;
+          c.fillStyle = "#fde68a";
+          c.font = "italic 600 " + (isStory ? 34 : 26) + "px " + fontStack;
+          cursorY = wrapText(c, '“' + note + '”', marginX, cursorY, W - (2 * marginX), isStory ? 44 : 34);
+        }
+
+        // PIE DE PLACA
+        var now = new Date();
+        var timeStr = now.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) + " hs";
+        var dateStr = now.toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
+        var footerText = dateStr + " · " + timeStr + (state.cfg.name ? " · Vía " + state.cfg.name : "");
+
+        c.fillStyle = "rgba(255, 255, 255, 0.75)";
+        c.font = "600 " + (isStory ? 32 : 24) + "px " + fontStack;
+        c.fillText(footerText, marginX, H - (isStory ? 80 : 50));
+
+        var dataUrl = cv.toDataURL("image/png");
+        $("placaImg").src = dataUrl;
+        state.currentCanvas = cv;
+      }
+
+      function roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
+
+      function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        var words = text.split(" ");
+        var line = "";
+        for (var n = 0; n < words.length; n++) {
+          var testLine = line + (line ? " " : "") + words[n];
+          var metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && line) {
+            ctx.fillText(line, x, y);
+            line = words[n];
+            y += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line, x, y);
+        return y + lineHeight;
+      }
+
+      // ACCIONES DE RESULTADOS
+      function sharePlaca() {
+        if (!state.currentCanvas) return;
+        state.currentCanvas.toBlob(function (blob) {
+          if (!blob) return;
+          var file = new File([blob], "alerta-familia-" + Date.now() + ".png", { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({
+              files: [file],
+              title: "Alerta de seguridad",
+              text: $("txtMessage").value
+            }).catch(function () { });
+          } else {
+            downloadPlaca();
+          }
+        }, "image/png");
+      }
+
+      function downloadPlaca() {
+        if (!state.currentCanvas) return;
+        var a = document.createElement("a");
+        a.download = "alerta-familia-" + Date.now() + ".png";
+        a.href = state.currentCanvas.toDataURL("image/png");
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Imagen descargada");
+      }
+
+      function copyAlertText() {
+        var ta = $("txtMessage");
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(ta.value).then(function () {
+            showToast("Mensaje copiado");
+          }, function () {
+            fallbackCopy(ta);
+          });
+        } else {
+          fallbackCopy(ta);
+        }
+      }
+
+      function fallbackCopy(ta) {
+        try {
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, 99999);
+          document.execCommand("copy");
+          showToast("Mensaje copiado");
+        } catch (e) {
+          showToast("Mantené presionado para copiar");
+        }
+      }
+
+      // GESTIÓN DE CÍRCULO Y AGENDA DEL CELULAR
+      function getValidCircle() {
+        return state.cfg.contacts.filter(function (c) {
+          return c && c.phone && cleanPhoneDigits(c.phone).length >= 8;
+        });
+      }
+
+      function renderContactInputs() {
+        var container = $("contactList");
+        container.innerHTML = "";
+        var contacts = state.cfg.contacts;
+
+        contacts.forEach(function (c, idx) {
+          var row = document.createElement("div");
+          row.className = "contact-row";
+
+          var nameInput = document.createElement("input");
+          nameInput.type = "text";
+          nameInput.placeholder = "Nombre (ej: Mamá)";
+          nameInput.value = c.name || "";
+          nameInput.setAttribute("aria-label", "Nombre contacto " + (idx + 1));
+
+          var phoneInput = document.createElement("input");
+          phoneInput.type = "tel";
+          phoneInput.placeholder = "+54 9 11 ...";
+          phoneInput.value = c.phone || "";
+          phoneInput.setAttribute("aria-label", "Teléfono contacto " + (idx + 1));
+          phoneInput.addEventListener("input", function () {
+            phoneInput.value = formatHumanPhone(phoneInput.value);
+          });
+
+          var btnDel = document.createElement("button");
+          btnDel.type = "button";
+          btnDel.className = "btn-del-contact";
+          btnDel.innerHTML = "✕";
+          btnDel.title = "Eliminar contacto";
+          btnDel.addEventListener("click", function () {
+            state.cfg.contacts.splice(idx, 1);
+            renderContactInputs();
+          });
+
+          row.appendChild(nameInput);
+          row.appendChild(phoneInput);
+          row.appendChild(btnDel);
+          container.appendChild(row);
+        });
+
+        if (contacts.length === 0) {
+          addContactRow();
+        }
+      }
+
+      function addContactRow() {
+        if (state.cfg.contacts.length >= 8) {
+          showToast("Límite de 8 contactos alcanzado");
+          return;
+        }
+        state.cfg.contacts.push({ name: "", phone: "" });
+        renderContactInputs();
+      }
+
+      // IMPORTAR DESDE LA AGENDA DEL CELULAR (CONTACT PICKER API)
+      function pickFromAgenda() {
+        if ('contacts' in navigator && 'select' in navigator.contacts) {
+          navigator.contacts.select(['name', 'tel'], { multiple: true })
+            .then(function (selected) {
+              if (selected && selected.length > 0) {
+                var added = 0;
+                selected.forEach(function (item) {
+                  if (state.cfg.contacts.length >= 8) return;
+                  var rawName = (item.name && item.name.length) ? item.name[0] : "";
+                  var rawTel = (item.tel && item.tel.length) ? item.tel[0] : "";
+                  if (rawName || rawTel) {
+                    state.cfg.contacts.push({
+                      name: rawName,
+                      phone: formatHumanPhone(rawTel)
+                    });
+                    added++;
+                  }
+                });
+                renderContactInputs();
+                showToast(added > 1 ? added + " contactos agregados" : "Contacto agregado");
+              }
+            })
+            .catch(function (err) {
+              if (err && err.name !== "AbortError") {
+                console.log("Contact Picker:", err);
+              }
+            });
+        } else {
+          showToast("La agenda directa funciona en celulares (Android/Chrome). Podés agregarlos manualmente abajo.");
+        }
+      }
+
+      function saveCircle() {
+        var rows = $("contactList").querySelectorAll(".contact-row");
+        var list = [];
+        rows.forEach(function (row) {
+          var inputs = row.querySelectorAll("input");
+          var n = inputs[0].value.trim();
+          var p = inputs[1].value.trim();
+          if (n || p) {
+            list.push({ name: n, phone: p });
+          }
+        });
+
+        state.cfg.name = $("cfgMyName").value.trim();
+        state.cfg.contacts = list;
+        saveConfig();
+        showToast("Contactos guardados");
+        checkCircleBanner();
+        showView("v-home");
+      }
+
+      function checkCircleBanner() {
+        var circle = getValidCircle();
+        $("circleBanner").style.display = circle.length === 0 ? "flex" : "none";
+      }
+
+      // LISTENERS Y EVENTOS
+      function initEvents() {
+        // Modo tabs (A mí vs A un familiar)
+        $("tabMine").addEventListener("click", function () {
+          state.mode = "mine";
+          $("tabMine").classList.add("on");
+          $("tabOther").classList.remove("on");
+          $("blockMine").style.display = "block";
+          $("blockOther").style.display = "none";
+        });
+
+        $("tabOther").addEventListener("click", function () {
+          state.mode = "other";
+          $("tabOther").classList.add("on");
+          $("tabMine").classList.remove("on");
+          $("blockMine").style.display = "none";
+          $("blockOther").style.display = "block";
+        });
+
+        // Botones de navegación de retorno
+        document.addEventListener("click", function (e) {
+          if (e.target.closest("[data-back]")) {
+            showView("v-home");
+          }
+          if (e.target.closest("[data-back-data]")) {
+            showView("v-data");
+          }
+        });
+
+        // Botones del header
+        $("btnTheme").addEventListener("click", toggleTheme);
+        $("btnCfg").addEventListener("click", function () {
+          $("cfgMyName").value = state.cfg.name || "";
+          renderContactInputs();
+          showView("v-cfg");
+        });
+        $("btnBannerCfg").addEventListener("click", function () {
+          $("cfgMyName").value = state.cfg.name || "";
+          renderContactInputs();
+          showView("v-cfg");
+        });
+        $("btnOpenGuide").addEventListener("click", function () {
+          showView("v-guide");
+        });
+        $("btnGoDenuncias").addEventListener("click", function () {
+          showView("v-guide");
+        });
+
+        // Falsa alarma / Recuperé mi cuenta
+        $("btnOk").addEventListener("click", function () {
+          selectSituation("ok", SITUATION_OK);
+          buildAlert();
+        });
+
+        // Formateo en vivo de teléfono en el formulario de datos
+        $("numInput").addEventListener("input", function (e) {
+          e.target.value = formatHumanPhone(e.target.value);
+        });
+
+        // Pegar del portapapeles en campos
+        $("btnPastePhone").addEventListener("click", function () {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(function (txt) {
+              $("numInput").value = formatHumanPhone(txt);
+              showToast("Número pegado");
+            }).catch(function () {
+              showToast("Permití el acceso al portapapeles");
+            });
+          }
+        });
+
+        $("btnPasteBank").addEventListener("click", function () {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(function (txt) {
+              $("bankInput").value = txt.trim();
+              showToast("CBU o Alias pegado");
+            }).catch(function () {
+              showToast("Permití el acceso al portapapeles");
+            });
+          }
+        });
+
+        // Manejo de input de archivos
+        $("shotInput").addEventListener("change", function (e) {
+          var file = e.target.files && e.target.files[0];
+          if (file) handleImageFile(file);
+        });
+
+        $("btnRemoveShot").addEventListener("click", resetShot);
+
+        // Pegado directo de capturas con Ctrl+V en formulario
+        window.addEventListener("paste", function (e) {
+          if (!$("v-data").classList.contains("on")) return;
+          var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+              var blob = items[i].getAsFile();
+              handleImageFile(blob);
+              showToast("Captura pegada");
+              break;
+            }
+          }
+        });
+
+        // Crear alertas
+        $("btnBuild").addEventListener("click", buildAlert);
+
+        // Formato de placa (Estados vs Publicación)
+        var fmtBtns = document.querySelectorAll(".format-btn");
+        fmtBtns.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            fmtBtns.forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            state.fmt = btn.getAttribute("data-fmt");
+            renderPlaca();
+          });
+        });
+
+        // Compartir y descargar placa
+        $("btnSharePlaca").addEventListener("click", sharePlaca);
+        $("btnDownloadPlaca").addEventListener("click", downloadPlaca);
+        $("btnCopyText").addEventListener("click", copyAlertText);
+
+        // Contactos de emergencia
+        $("btnPickAgenda").addEventListener("click", pickFromAgenda);
+        $("btnAddContact").addEventListener("click", addContactRow);
+        $("btnSaveCfg").addEventListener("click", saveCircle);
+
+        // PWA: Manejo de instalación en el celular
+        var deferredPrompt = null;
+        window.addEventListener("beforeinstallprompt", function (e) {
+          e.preventDefault();
+          deferredPrompt = e;
+          var btn = $("btnInstallApp");
+          if (btn) btn.style.display = "inline-flex";
+        });
+
+        $("btnInstallApp").addEventListener("click", function () {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function (choice) {
+              if (choice.outcome === "accepted") {
+                showToast("Instalando Alerta Familia...");
+                $("btnInstallApp").style.display = "none";
+              }
+              deferredPrompt = null;
+            });
+          } else {
+            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIos) {
+              showToast("En iPhone: tocá el botón Compartir y elegí 'Agregar a pantalla de inicio'");
+            } else {
+              showToast("Tocá los 3 puntos de tu navegador y elegí 'Instalar aplicación' o 'Agregar a la pantalla principal'");
+            }
+          }
+        });
+
+        window.addEventListener("appinstalled", function () {
+          showToast("¡App instalada en tu celular!");
+          var btn = $("btnInstallApp");
+          if (btn) btn.style.display = "none";
+        });
+      }
+
+      // REGISTRO DE SERVICE WORKER (OFFLINE PWA)
+      function registerServiceWorker() {
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('./sw.js').catch(function (err) {
+              console.log('SW registration:', err);
+            });
+          });
+        }
+      }
+
+      // INICIALIZACIÓN
+      initTheme();
+      loadConfig();
+      renderSituations();
+      checkCircleBanner();
+      initEvents();
+      registerServiceWorker();
+      showView("v-home");
+
+    })();
+  </script>
+</body>
+
+</html>
