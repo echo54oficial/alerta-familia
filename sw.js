@@ -1,5 +1,5 @@
 // Service Worker - Alerta Familia (Echo 54)
-const CACHE_NAME = 'alerta-familia-v1';
+const CACHE_NAME = 'alerta-familia-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -529,8 +529,8 @@
     }
 
     .drop-icon {
-      font-size: 1.6rem;
-      margin-bottom: 4px;
+      font-size: 1.8rem;
+      margin-bottom: 0;
       display: block;
     }
 
@@ -538,11 +538,14 @@
       font-weight: 700;
       font-size: 0.95rem;
       color: var(--fg);
+      display: block;
     }
 
     .drop-sub {
       font-size: 0.8rem;
       color: var(--fg-muted);
+      display: block;
+      margin-top: 2px;
     }
 
     /* OCR STATUS & DETECTED PILLS */
@@ -989,7 +992,7 @@
       <div id="blockMine">
         <div class="situation-intro">
           <h2>¿Qué pasó?</h2>
-          <p>Elegí una situación y prepará en segundos una alerta para redes, WhatsApp y SMS.</p>
+          <p>Elegí una situación para preparar la alerta en segundos.</p>
         </div>
         <div class="type-grid" id="typesMine"></div>
 
@@ -1004,7 +1007,7 @@
       <div id="blockOther" style="display:none;">
         <div class="situation-intro">
           <h2>¿Qué pasó?</h2>
-          <p>Elegí una situación para alertar a tu círculo y evitar que caigan en la trampa.</p>
+          <p>Elegí una situación para alertar a tus contactos.</p>
         </div>
         <div class="type-grid" id="typesOther"></div>
       </div>
@@ -1039,9 +1042,8 @@
       <div class="form-group" id="groupTargetName">
         <label for="targetName">
           <span id="labelTargetName">¿A quién le pasó?</span>
-          <span class="label-sub">(Ej: Mamá, Papá, Martín)</span>
         </label>
-        <input type="text" id="targetName" placeholder="Ej: Mamá" autocomplete="off">
+        <input type="text" id="targetName" placeholder="Ej: Mamá, Papá o Martín" autocomplete="off">
       </div>
 
       <!-- SUBIDA DE CAPTURA CON OCR -->
@@ -1050,11 +1052,9 @@
           Captura de pantalla (opcional)
           <span class="label-sub">Extrae el número y datos de pago automáticamente.</span>
         </label>
-        <label class="file-dropzone" for="shotInput" id="dropArea">
+        <label class="file-dropzone" for="shotInput" id="dropArea" title="Elegí una captura o pegala (Ctrl+V)">
           <input type="file" id="shotInput" accept="image/*">
           <span class="drop-icon">📷</span>
-          <span class="drop-title">Elegí una captura o pegala (Ctrl+V)</span>
-          <span class="drop-sub">Procesamiento privado en tu dispositivo</span>
         </label>
 
         <!-- ESTADO OCR -->
@@ -1077,14 +1077,13 @@
       <div class="form-group" id="groupPhone">
         <label for="numInput">
           <span id="labelPhone">Número sospechoso</span>
-          <span class="label-sub">Lo mostraremos con espacios para leerlo mejor.</span>
+          <span class="label-sub" id="labelPhoneSub">Evita que se comuniquen con el atacante.</span>
         </label>
         <div class="input-with-action">
           <input type="tel" id="numInput" class="mono-input" placeholder="+54 9 11 2345 6789" autocomplete="off"
             inputmode="tel">
           <button type="button" class="input-action-btn" id="btnPastePhone">📋 Pegar</button>
         </div>
-        <p class="hint" id="phoneHint">Lo mostraremos con espacios para leerlo mejor.</p>
       </div>
 
       <!-- ALIAS O CBU (OPCIONAL) -->
@@ -1098,14 +1097,12 @@
             autocomplete="off">
           <button type="button" class="input-action-btn" id="btnPasteBank">📋 Pegar</button>
         </div>
-        <p class="hint">Si te pasaron un Alias o CBU, agregalo para advertir a tus contactos.</p>
       </div>
 
       <!-- NOTA / DETALLE ADICIONAL -->
       <div class="form-group">
         <label for="noteInput">
           Detalle breve (opcional)
-          <span class="label-sub">Una sola frase corta.</span>
         </label>
         <input type="text" id="noteInput" maxlength="110"
           placeholder="Ej: Dice que tuvo una urgencia y cambió de línea" autocomplete="off">
@@ -1132,7 +1129,6 @@
             <button type="button" class="format-btn" data-fmt="square">Publicación</button>
           </div>
         </div>
-        <p class="hint" style="margin: 0 0 10px;">Compartila en tus estados para alertar a tus contactos.</p>
         <div class="placa-wrapper">
           <img class="placa-img" id="placaImg" alt="Placa gráfica de alerta">
         </div>
@@ -1151,7 +1147,6 @@
         <div class="step-header">
           <h3><span class="step-badge">2</span> Mensaje para grupos y redes</h3>
         </div>
-        <p class="hint" style="margin: 0 0 10px;">Copiá el mensaje o envialo directamente a tus grupos.</p>
         <textarea id="txtMessage" rows="5" aria-label="Texto de alerta"></textarea>
         <div class="action-row">
           <button type="button" class="btn-action" id="btnCopyText">
@@ -1168,7 +1163,6 @@
         <div class="step-header">
           <h3><span class="step-badge">3</span> SMS de emergencia</h3>
         </div>
-        <p class="hint" style="margin: 0 0 10px;">Avisá a tus contactos de emergencia si no podés usar WhatsApp.</p>
         <div class="action-row single">
           <a class="btn-action btn-sms" id="btnSendSms" href="#">
             Enviar SMS
@@ -1182,7 +1176,6 @@
         <div class="step-header">
           <h3>Qué hacer ahora - Primeros 15 minutos</h3>
         </div>
-        <p class="hint" style="margin: 0 0 10px;">Consultá los canales oficiales y conservá las pruebas.</p>
         <div class="action-row single" style="gap:8px;">
           <a class="btn-action" id="btnKillWa" href="#">
             Suspender cuenta de WhatsApp por correo
@@ -1205,14 +1198,18 @@
       </div>
 
       <div class="form-group">
-        <label for="cfgMyName">Tu nombre</label>
-        <input type="text" id="cfgMyName" placeholder="Ej: Carlos / Mamá" autocomplete="off">
-        <p class="hint">Aparecerá como remitente de las alertas para que te reconozcan rápido.</p>
+        <label for="cfgMyName">
+          Tu nombre
+          <span class="label-sub">Para que te reconozcan en las alertas.</span>
+        </label>
+        <input type="text" id="cfgMyName" placeholder="Ej: Carlos o Mamá" autocomplete="off">
       </div>
 
       <div class="form-group">
-        <label>Personas de confianza</label>
-        <p class="hint" style="margin: 0 0 10px;">Se guardan solo en este teléfono. No se envían a ningún servidor.</p>
+        <label>
+          Personas de confianza
+          <span class="label-sub">Guardado privado solo en este dispositivo.</span>
+        </label>
         <div id="contactList"></div>
         <button type="button" class="btn-action" id="btnAddContact" style="width:100%; margin-top:8px;">
           + Agregar contacto
@@ -1445,6 +1442,7 @@
           color: "#f97316",
           tag: "BLOQUEAR",
           isOther: true,
+          needTarget: false,
           needPhone: true,
           rules: [
             "Número identificado enviando mensajes falsos.",
@@ -1665,10 +1663,10 @@
         chip.style.color = item.color;
 
         // Ajustar campos según situación
-        if (item.isOther) {
+        if (item.isOther && item.needTarget !== false) {
           $("groupTargetName").style.display = "block";
           $("labelTargetName").textContent = "¿A quién le pasó?";
-          $("targetName").placeholder = "Ej: Mamá";
+          $("targetName").placeholder = "Ej: Mamá, Papá o Martín";
           $("targetName").value = "";
         } else {
           $("groupTargetName").style.display = "none";
@@ -1678,7 +1676,7 @@
         // Teléfono
         if (item.needPhone) {
           $("groupPhone").style.display = "block";
-          $("labelPhone").textContent = "Número sospechoso";
+          $("labelPhone").textContent = item.phoneLabel || "Número sospechoso";
           $("numInput").placeholder = "+54 9 11 2345 6789";
         } else {
           $("groupPhone").style.display = "none";
@@ -1834,7 +1832,7 @@
 
         // Actualizar Chip de resultados
         var chip = $("resultChip");
-        chip.textContent = cur.em + " " + (cur.isOther && ctx.targetName ? "Alerta sobre " + ctx.targetName : cur.title);
+        chip.textContent = cur.em + " " + (cur.isOther && cur.needTarget !== false && ctx.targetName ? "Alerta sobre " + ctx.targetName : cur.title);
         chip.style.borderColor = cur.color;
         chip.style.color = cur.color;
 
@@ -1951,7 +1949,7 @@
         // SUBTÍTULO
         c.font = "800 " + (isStory ? 54 : 44) + "px " + fontStack;
         var subHeadline = cur.label;
-        if (cur.isOther && targetName) {
+        if (cur.isOther && cur.needTarget !== false && targetName) {
           subHeadline = "HACKEARON A " + targetName.toUpperCase();
         }
         cursorY = wrapText(c, subHeadline, marginX, cursorY, W - (2 * marginX), isStory ? 68 : 52);
