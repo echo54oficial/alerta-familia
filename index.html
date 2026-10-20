@@ -122,24 +122,50 @@
       margin-bottom: 20px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--line);
+      gap: 10px;
     }
 
-    .brand {
+    .brand-btn {
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 10px;
+      color: inherit;
+      text-decoration: none;
+      border-radius: 12px;
+    }
+
+    .brand-btn:active .brand-icon {
+      transform: scale(0.92);
     }
 
     .brand-icon {
       font-size: 1.4rem;
       background: linear-gradient(135deg, #ef4444, #f97316);
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+
+    /* Ocultar el texto del logo en celulares para dar espacio a los botones */
+    .brand-text {
+      display: none;
+      text-align: left;
+    }
+
+    @media (min-width: 580px) {
+      .brand-text {
+        display: block;
+      }
     }
 
     .brand-text h1 {
@@ -158,7 +184,9 @@
 
     .header-actions {
       display: flex;
+      align-items: center;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     .btn-icon {
@@ -168,6 +196,14 @@
       border-radius: 10px;
       padding: 7px 11px;
       font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
@@ -786,7 +822,13 @@
       filter: brightness(1.1);
     }
 
-    /* BANNER MI CIRCULO */
+    /* BANNER MI CIRCULO & BANNER INSTALACION */
+    @media all and (display-mode: standalone) {
+      .install-banner {
+        display: none !important;
+      }
+    }
+
     .circle-banner {
       background: var(--blue-soft);
       border: 1px solid rgba(59, 130, 246, 0.35);
@@ -911,17 +953,14 @@
   <main>
     <!-- TOP BAR -->
     <header>
-      <div class="brand">
+      <button class="brand-btn" id="btnHomeBrand" type="button" aria-label="Ir al inicio" title="Ir al inicio">
         <div class="brand-icon">🛡️</div>
         <div class="brand-text">
           <h1>Alerta Familia</h1>
           <small>Escudo anti-estafas</small>
         </div>
-      </div>
+      </button>
       <div class="header-actions">
-        <button class="btn-icon" id="btnInstallApp" type="button" style="color: var(--accent); border-color: rgba(56, 189, 248, 0.4);" title="Instalar en el celular">
-          📲 Instalar
-        </button>
         <button class="btn-icon" id="btnOpenGuide" type="button" title="Canales oficiales de denuncia">
           ⚖️ Denuncias
         </button>
@@ -977,6 +1016,15 @@
           Agregá a tus personas de confianza para avisarles por SMS si no podés usar WhatsApp.
         </div>
         <button class="btn-sm" id="btnBannerCfg" type="button">Configurar</button>
+      </div>
+
+      <!-- BANNER DE INSTALACIÓN (SOLO PARA QUIENES ENTRAN DESDE EL NAVEGADOR) -->
+      <div class="circle-banner install-banner" id="pwaInstallBanner" style="display:none; border-color: rgba(56, 189, 248, 0.35); background: rgba(56, 189, 248, 0.08); margin-top: 14px;">
+        <div class="circle-banner-text">
+          <strong style="color: #38bdf8;">📲 Instalar Alerta Familia</strong>
+          Agregala a tu pantalla de inicio para usarla a pantalla completa incluso sin internet.
+        </div>
+        <button class="btn-sm" id="btnBannerInstall" type="button" style="background: #0284c7; white-space: nowrap;">Instalar</button>
       </div>
     </section>
 
@@ -1163,15 +1211,11 @@
       </div>
 
       <div class="form-group">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-          <label style="margin:0;">Personas de confianza</label>
-          <button type="button" class="btn-action btn-contacts-agenda" id="btnPickAgenda" style="padding:6px 12px; font-size:0.8rem;">
-            📖 Elegir de la agenda
-          </button>
-        </div>
+        <label>Personas de confianza</label>
+        <p class="hint" style="margin: 0 0 10px;">Se guardan solo en este teléfono. No se envían a ningún servidor.</p>
         <div id="contactList"></div>
         <button type="button" class="btn-action" id="btnAddContact" style="width:100%; margin-top:8px;">
-          + Agregar contacto manualmente
+          + Agregar contacto
         </button>
       </div>
 
@@ -2129,38 +2173,7 @@
         renderContactInputs();
       }
 
-      // IMPORTAR DESDE LA AGENDA DEL CELULAR (CONTACT PICKER API)
-      function pickFromAgenda() {
-        if ('contacts' in navigator && 'select' in navigator.contacts) {
-          navigator.contacts.select(['name', 'tel'], { multiple: true })
-            .then(function (selected) {
-              if (selected && selected.length > 0) {
-                var added = 0;
-                selected.forEach(function (item) {
-                  if (state.cfg.contacts.length >= 8) return;
-                  var rawName = (item.name && item.name.length) ? item.name[0] : "";
-                  var rawTel = (item.tel && item.tel.length) ? item.tel[0] : "";
-                  if (rawName || rawTel) {
-                    state.cfg.contacts.push({
-                      name: rawName,
-                      phone: formatHumanPhone(rawTel)
-                    });
-                    added++;
-                  }
-                });
-                renderContactInputs();
-                showToast(added > 1 ? added + " contactos agregados" : "Contacto agregado");
-              }
-            })
-            .catch(function (err) {
-              if (err && err.name !== "AbortError") {
-                console.log("Contact Picker:", err);
-              }
-            });
-        } else {
-          showToast("La agenda directa funciona en celulares (Android/Chrome). Podés agregarlos manualmente abajo.");
-        }
-      }
+
 
       function saveCircle() {
         var rows = $("contactList").querySelectorAll(".contact-row");
@@ -2310,44 +2323,72 @@
         $("btnDownloadPlaca").addEventListener("click", downloadPlaca);
         $("btnCopyText").addEventListener("click", copyAlertText);
 
+        // Volver al inicio tocando el escudo
+        var brandBtn = $("btnHomeBrand");
+        if (brandBtn) {
+          brandBtn.addEventListener("click", function () {
+            showView("v-home");
+          });
+        }
+
         // Contactos de emergencia
-        $("btnPickAgenda").addEventListener("click", pickFromAgenda);
         $("btnAddContact").addEventListener("click", addContactRow);
         $("btnSaveCfg").addEventListener("click", saveCircle);
 
-        // PWA: Manejo de instalación en el celular
+        // Banner de instalación PWA (solo cuando no está instalada)
+        setupPwaInstallBanner();
+      }
+
+      function setupPwaInstallBanner() {
+        var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+        if (isStandalone) {
+          return; // Ya está corriendo como app instalada
+        }
+
+        var banner = $("pwaInstallBanner");
+        var btn = $("btnBannerInstall");
         var deferredPrompt = null;
+
         window.addEventListener("beforeinstallprompt", function (e) {
           e.preventDefault();
           deferredPrompt = e;
-          var btn = $("btnInstallApp");
-          if (btn) btn.style.display = "inline-flex";
+          if (banner) banner.style.display = "flex";
         });
 
-        $("btnInstallApp").addEventListener("click", function () {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(function (choice) {
-              if (choice.outcome === "accepted") {
-                showToast("Instalando Alerta Familia...");
-                $("btnInstallApp").style.display = "none";
-              }
-              deferredPrompt = null;
-            });
-          } else {
-            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            if (isIos) {
-              showToast("En iPhone: tocá el botón Compartir y elegí 'Agregar a pantalla de inicio'");
-            } else {
-              showToast("Tocá los 3 puntos de tu navegador y elegí 'Instalar aplicación' o 'Agregar a la pantalla principal'");
+        // Mostrar banner si se visita desde cualquier navegador y no está instalada
+        if (!isStandalone) {
+          setTimeout(function () {
+            if (banner && banner.style.display === "none") {
+              banner.style.display = "flex";
             }
-          }
-        });
+          }, 600);
+        }
+
+        if (btn) {
+          btn.addEventListener("click", function () {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then(function (choice) {
+                if (choice.outcome === "accepted") {
+                  showToast("Instalando Alerta Familia...");
+                  if (banner) banner.style.display = "none";
+                }
+                deferredPrompt = null;
+              });
+            } else {
+              var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+              if (isIos) {
+                showToast("En iPhone: tocá Compartir y elegí 'Agregar a pantalla de inicio'");
+              } else {
+                showToast("Tocá los 3 puntos del navegador y elegí 'Instalar aplicación' o 'Agregar a la pantalla principal'");
+              }
+            }
+          });
+        }
 
         window.addEventListener("appinstalled", function () {
           showToast("¡App instalada en tu celular!");
-          var btn = $("btnInstallApp");
-          if (btn) btn.style.display = "none";
+          if (banner) banner.style.display = "none";
         });
       }
 
